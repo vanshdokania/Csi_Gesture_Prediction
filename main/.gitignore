@@ -1,0 +1,17 @@
+# data and results never go into git
+*.csi
+*.npz
+*.npy
+*.pt
+*.mp4
+*.pkl
+percom/
+external/
+# python
+__pycache__/
+*.pyc
+.venv/
+# editors / OS
+.vscode/
+.idea/
+.DS_Store

@@ -1,0 +1,11 @@
+# Python packages for everything except the CSI conversion.
+# (csi_tools/csi_to_npz.py additionally needs the PicoScenes Python toolbox, see the README.)
+numpy
+scipy
+matplotlib
+scikit-learn
+Pillow
+torch>=2.0
+torchvision>=0.15
+# The instructor's SiWiS repository has its own requirements.txt (it lists mmpose / mmcv / mmdet for the
+# HRNet backend; we did not need them because we used the torchvision Keypoint R-CNN).
