@@ -1,9 +1,18 @@
 # Gesture recognition from Wi-Fi signals (CSI → body pose → spiking neural network)
 
-This repository contains all the code we wrote for our B.Tech project at IIIT Delhi (ECE).
+| | |
+|---|---|
+| **Author** | Vansh Dokania |
+| **Roll number** | 2024600 |
+| **College** | IIIT Delhi (IIITD), ECE |
+| **Project** | BTP (B.Tech project) |
+| **Supervisor** | Dr. Pragma Kar |
+| **PhD mentor** | Vijay Kumar |
+
+This repository contains all the code I wrote for my BTP at IIIT Delhi.
 The question was simple: **can a Wi-Fi router and a laptop tell which hand a person is raising, without any camera?**
 
-We record three gestures, each repeated about 48 times per recording:
+I record three gestures, each repeated about 48 times per recording:
 
 | code | gesture |
 |------|---------|
@@ -14,7 +23,7 @@ We record three gestures, each repeated about 48 times per recording:
 The only input to the final classifier is the Wi-Fi channel state information (CSI). A camera is used during recording,
 but only to create training labels. It is never an input of the final model.
 
-> The code was written during the project and collected afterwards. It runs end to end on our setup
+> The code was written during the project and collected afterwards. It runs end to end on my setup
 > (Intel AX200 card with PicoScenes, EMEET webcam, one GPU server), but it is research code, not a polished package.
 > Section [Known limitations](#known-limitations) lists what to keep in mind.
 
@@ -22,11 +31,11 @@ but only to create training labels. It is never an input of the final model.
 
 ## 1. The story in five steps
 
-1. **Direct approach: Doppler heatmaps → SNN.** We turned the CSI into a Doppler heatmap (how fast things move) and fed it
+1. **Direct approach: Doppler heatmaps → SNN.** I turned the CSI into a Doppler heatmap (how fast things move) and fed it
    straight to a spiking neural network (SNN). Tested on a person the model had never seen (train on three people, test on
    the fourth), it reached only **35 % per frame / 44 % per recording** (chance is 33 %). The heatmap shows speed, not
    position, and raising the left or the right hand look almost the same in speed.
-2. **Add position: predict the body pose from Wi-Fi.** We used the SiWiS model (instructor's repository) to predict a body
+2. **Add position: predict the body pose from Wi-Fi.** I used the SiWiS model (the repository I was given for this project) to predict a body
    outline and 17 joints from the CSI. The labels for this come from video, using Mask R-CNN and Keypoint R-CNN.
    The SNN then reads the *predicted pose* over time (outline, joints, and their speed).
 3. **Cross-person test.** Still weak (about 43–54 %). A control run with poses taken from the *video* gave 75 % / 80 %, so the
@@ -34,7 +43,7 @@ but only to create training labels. It is never an input of the final model.
    build and style, so a model trained on other people does not transfer.
 4. **Within-person test.** Train and test on the same person (first 80 % of each recording for training, last 20 % for testing).
    On fixed 5-second windows the SNN reaches **77 % per window / 81 % per recording** with arm joints and speed.
-5. **Complete gestures.** A window can cut a gesture in half, so we cut each recording into single gestures using the video
+5. **Complete gestures.** A window can cut a gesture in half, so I cut each recording into single gestures using the video
    (the hand-height curve of the person), and classify one complete gesture at a time. Result: **about 89 %** on 269 test
    gestures. A control with video poses reaches 99–100 %.
 
@@ -81,7 +90,7 @@ The flowcharts of the whole pipeline are in `docs/images/` (see also [docs/workf
 ```
 
 Not included in this repository: the recordings (too large and contain people), and the instructor's SiWiS repository.
-The latter is cloned by `scripts/setup_siwis.sh` (see below). We did not modify it.
+The latter is cloned by `scripts/setup_siwis.sh` (see below). I did not modify it.
 
 ---
 
@@ -89,10 +98,10 @@ The latter is cloned by `scripts/setup_siwis.sh` (see below). We did not modify 
 
 ### What you need
 * **Recording (laptop):** a laptop with an Intel AX200 Wi-Fi card, [PicoScenes](https://ps.zpj.io) installed, a 5 GHz router,
-  a USB webcam, `ffmpeg` and `v4l-utils`. We used a TP-Link router on a 5 GHz channel (carrier about 5.775 GHz), the AX200 with two antennas, and
+  a USB webcam, `ffmpeg` and `v4l-utils`. I used a TP-Link router on a 5 GHz channel (carrier about 5.775 GHz), the AX200 with two antennas, and
   an EMEET SmartCam S600 (1080p, 30 fps).
 * **CSI conversion (laptop):** the PicoScenes Python toolbox in its own virtual environment. Only this environment can read `.csi` files.
-* **Training (GPU server):** a recent Python 3, PyTorch and torchvision. We used a server with 4 × H200 and started jobs through a
+* **Training (GPU server):** a recent Python 3, PyTorch and torchvision. I used a server with 4 × H200 and started jobs through a
   `gpurun` wrapper inside `tmux`. Everything also runs on a normal machine, just slower. Set `RUN=` (empty) to skip the wrapper.
 
 ### Install
@@ -100,7 +109,7 @@ The latter is cloned by `scripts/setup_siwis.sh` (see below). We did not modify 
 git clone <this repository>
 cd <this repository>
 pip install -r requirements.txt            # on the laptop and on the server
-bash scripts/setup_siwis.sh                # server only: clones the instructor's SiWiS repo and copies our scripts into it
+bash scripts/setup_siwis.sh                # server only: clones the SiWiS repo and copies my scripts into it
 ```
 
 All folders are set in `scripts/env.sh` (default root is `~/percom`). You can override every one of them from the shell,
@@ -116,7 +125,7 @@ Change both for your own setup (`ls -l /dev/v4l/by-id/` shows your camera).
 
 Every trial that `record.sh` makes is a folder `experiment_<date>_<time>/` with
 `video.mp4`, `timing.txt` (start times of CSI and video), one or more `rx_*.csi` files and some logs.
-We copy these folders to an SSD in this structure:
+I copy these folders to an SSD in this structure:
 
 ```
 <SSD>/percom/
@@ -126,7 +135,7 @@ We copy these folders to an SSD in this structure:
 └── RHU/...
 ```
 
-The folder name `<ACT>_S<session>_<Person>` is read by the code. In total we recorded 36 recordings of 4 people
+The folder name `<ACT>_S<session>_<Person>` is read by the code. In total there are 36 recordings of 4 people
 (35 with a usable video) for the final experiments. Two more people (Divij and Nikita) were recorded as well, but they are not part of the experiments in the report
 and are excluded by default (`--exclude`). In the report the four people are called P1–P4.
 
@@ -134,7 +143,7 @@ and are excluded by default (`--exclude`). In the report the four people are cal
 
 ## 5. How to run: the workflow, step by step
 
-Every step below has a ready script in `scripts/`. They only call the Python files with the settings we used, so read them
+Every step below has a ready script in `scripts/`. They only call the Python files with the settings I used, so read them
 as the documentation of the exact commands.
 
 | step | where | what | command |
@@ -230,7 +239,7 @@ AdamW lr 3e-4, cosine decay, gradient clipping 1.0, 80 epochs (60 epochs in the 
 | Within person, complete gestures (269 test gestures) | about 89 % (arm joints + speed); see [docs/results.md](docs/results.md) |
 | Control with video poses, complete gestures | 99–100 % |
 
-What we learned: the SNN is not the problem (control runs are high). The limit is predicting the pose from Wi-Fi for someone the model has not seen,
+What I learned: the SNN is not the problem (control runs are high). The limit is predicting the pose from Wi-Fi for someone the model has not seen,
 because height, weight and body structure change the reflections. A model has to be calibrated to each person.
 
 ---
@@ -239,20 +248,20 @@ because height, weight and body structure change the reflections. A model has to
 
 * The recordings are not part of the repository, so nothing here can be re-run without your own data.
 * With only four people the cross-person numbers are noisy, and one person (P3) is clearly harder than the others.
-* The within-person test windows overlap, and in the first within-person version a window can cut through a gesture. That is why we
+* The within-person test windows overlap, and in the first within-person version a window can cut through a gesture. That is why I
   moved to complete gestures.
-* The Wi-Fi angle-of-arrival feature assumes half-wavelength antenna spacing (`--spacing 0.5`); we did not measure it.
+* The Wi-Fi angle-of-arrival feature assumes half-wavelength antenna spacing (`--spacing 0.5`); I did not measure it.
 * Time alignment of video and CSI relies on the time stamps in `timing.txt`; `prepare_percom.py` prints a clock check and warns if a
   recording looks shifted by more than a few seconds.
-* The code was developed on one setup. Paths such as the camera device and the router IP are set at the top of the scripts.
+* The code was developed on a single setup. Paths such as the camera device and the router IP are set at the top of the scripts.
 
 ---
 
 ## 9. Credits
 
 * The pose model, its losses and the dataset class come from the SiWiS reproduction repository
-  [KateIronic/siwis-pose-estimation](https://github.com/KateIronic/siwis-pose-estimation) provided by our instructor.
-  We use it unchanged and only wrote the data preparation, new input channels, training scripts and the SNN stages around it.
+  [KateIronic/siwis-pose-estimation](https://github.com/KateIronic/siwis-pose-estimation), which I was given for the project.
+  I use it unchanged and only wrote the data preparation, new input channels, training scripts and the SNN stages around it.
 * The CSI cleaning stages follow the WiLight / AxSense preprocessing code.
 * Body outline and joints come from the pretrained torchvision Mask R-CNN and Keypoint R-CNN.
 * CSI is recorded with [PicoScenes](https://ps.zpj.io).
